@@ -63,7 +63,7 @@ class GradientDescent:
         diff_x = self.max_x - self.min_x
         diff_y = self.max_y - self.min_y
         self.theta1 = self.theta1 * diff_y / diff_x
-        self.theta0 = self.theta0 * diff_y + self.min_y
+        self.theta0 = self.theta0 * diff_y + self.min_y #TODO WRONG
         print(self.theta1, self.theta0)
 
     def train(self):
@@ -82,6 +82,23 @@ class GradientDescent:
             print('[info] The model did not converged after', l, 'step.')
     
     def show_data(self):
+        X = self.data[self.x]
+        Y = self.data[self.y]
+        plt.subplot(211)
+        plt.scatter(X, Y)
+        plt.plot([self.min_x, self.max_x], [self.estimate(self.min_x), self.estimate(self.max_x)], linewidth=2, color='red')
+        plt.title('Price of differents cars in function of their mileage')
+        plt.xlabel('mileage (km)')
+        plt.ylabel('price (euros)')
+        plt.subplot(212)
+        plt.title('Evolution of error during the gradient descent')
+        plt.xlabel('steps')
+        plt.ylabel('sum of squarred errors')
+        plt.plot(self.error)
+        plt.tight_layout()
+        plt.show()
+
+    def show_std_data(self):
         X = [d[0] for d in self.stdata]
         Y = [d[1] for d in self.stdata]
         plt.subplot(211)
@@ -168,8 +185,9 @@ def main():
     GD.scaling()
 #    GD.show_std_plane()
     GD.train()
-    GD.show_data()
+    GD.show_std_data()
     GD.rescale()
+    GD.show_data()
 
 if __name__ == "__main__":
     main()
