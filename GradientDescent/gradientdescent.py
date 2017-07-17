@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from mpl_toolkits.mplot3d import Axes3D
 
 class GradientDescent:
     '''
@@ -16,7 +17,7 @@ class GradientDescent:
         self.x = None
         self.y = None
         self.m = 0
-        self.LearningRate = 0.002
+        self.LearningRate = 0.005
         self.theta0 = 0 #9000
         self.theta1 = 0 #-0.025
 
@@ -37,7 +38,6 @@ class GradientDescent:
                     self.data[self.x].append(x)
                     self.data[self.y].append(y)
         self.m = len(self.data[self.x])
-        print(self.data)
    
     def standardization(self):
         min_x = min(self.data[self.x])
@@ -65,9 +65,10 @@ class GradientDescent:
         self.theta1 = self.theta1 - (self.LearningRate * theta1_gradient)
     
     def train(self):
-        for _ in range(35):
+        for _ in range(25):
             self.error.append(self.sum_square_error())
             self.gradient_step()
+        print('Y = ', self.theta1,'X + ', self.theta0)
     
     def stdX(self):
         return [x[0] for x in self.stdata]
@@ -92,6 +93,28 @@ class GradientDescent:
         plt.tight_layout()
         plt.show()
 
+    def fct_error(self, t0, t1):
+        return sum([(d[1] - (d[0] * t1 + t0)) ** 2 for d in self.generator()]) / self.m
+
+    def show_plane(self):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        x = np.arange(0, 20000, 500)
+        y = np.arange(-0.5, 0.5, 0.005)
+        X, Y = np.meshgrid(x, y)
+        zs = np.array([self.fct_error(b,a) for b,a in zip(np.ravel(X), np.ravel(Y))])
+        Z = zs.reshape(X.shape)
+        ax.plot_surface(X, Y, Z, cmap = 'Reds', edgecolors='black')
+        ax.set_xlabel('θ_0 (y-intercept)', fontweight='bold')
+        ax.set_ylabel('θ_1 (slope)', fontweight='bold')
+        ax.set_zticks([])
+        ax.xaxis.labelpad=10
+        ax.yaxis.labelpad=10
+        plt.title('Sum of square Errors', fontweight='bold')
+        #ax.view_init(45, 45)
+        fig.tight_layout()
+        plt.show()
+
     def estimate(self, mileage):
         return self.theta0 + self.theta1 * mileage
 
@@ -105,9 +128,10 @@ class GradientDescent:
 def main():
     GD = GradientDescent()
     GD.get_data()
-    GD.standardization()
-    GD.train()
-    GD.show_data()
+    GD.show_plane()
+#    GD.standardization()
+#    GD.train()
+#    GD.show_data()
 
 if __name__ == "__main__":
     main()
