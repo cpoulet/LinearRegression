@@ -10,7 +10,11 @@ class LinearFunction:
         self.get_theta()
 
     def get_theta(self):
-        with open('theta_values', 'r') as f:
+        print('''Enter the path to load the thetas values (\033[1;37mReturn\033[0;m to use the standard path '/Users/raccoon/Documents/LinearRegression/LinearFunction/theta_values') :''')
+        path = input().strip()
+        if not path:
+            path = '/Users/raccoon/Documents/LinearRegression/LinearFunction/theta_values'
+        with open(path, 'r') as f:
             for l in f:
                 self.theta0, self.theta1 = map(float, l.split())
                 if self.v:

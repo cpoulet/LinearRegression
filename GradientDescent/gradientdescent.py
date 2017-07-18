@@ -34,7 +34,11 @@ class GradientDescent:
                 print('[info] graphical output mode.')
 
     def get_data(self):
-        with open('../Dataset/data.csv', 'r') as f:
+        print('''Enter the path of the datas (\033[1;37mReturn\033[0;m to use the standard path '/Users/raccoon/Documents/LinearRegression/Dataset/data.csv') :''')
+        path = input().strip()
+        if not path:
+            path = '/Users/raccoon/Documents/LinearRegression/Dataset/data.csv'
+        with open(path, 'r') as f:
             for l in f:
                 if self.x == None and self.y == None:
                     self.x, self.y = l.strip().split(',')
@@ -75,9 +79,9 @@ class GradientDescent:
         self.theta1 = self.theta1 * diff_y / diff_x
         self.theta0 = self.theta0 * diff_y + self.min_y - self.theta1*self.min_x
         if self.v:
-            print(']info] theta0 = {:.1f} and theta1 = {:.3f}'.format(self.theta0, self.theta1))
+            print('[info] theta0 = {:.1f} and theta1 = {:.3f}'.format(self.theta0, self.theta1))
         if self.g:
-            self.show_data()
+            self.show_rslt()
 
     def train(self):
         rookie = True
@@ -91,11 +95,11 @@ class GradientDescent:
             self.gradient_step()
         if self.v:
             if l != 10000:
-                print('[info] The model just converged after', l, 'step.')
+                print('[info] \033[1;32mThe model just converged after', l, 'step.\033[0;m')
             else:
-                print('[info] The model did not converged after', l, 'step.')
+                print('[info] \033[1;31mThe model did not converged after', l, 'step.\033[0;m')
     
-    def show_data(self):
+    def show_rslt(self):
         X = self.data[self.x]
         Y = self.data[self.y]
         plt.subplot(211)
@@ -155,13 +159,19 @@ class GradientDescent:
         return self.theta0 + self.theta1 * mileage
 
     def save_theta(self):
-        with open('../LinearFunction/theta_values', 'w') as f:
+        print('''Enter the path to save thetas values (\033[1;37mReturn\033[0;m to use the standard path '/Users/raccoon/Documents/LinearRegression/LinearFunction/theta_values') :''')
+        path = input().strip()
+        if not path:
+            path = '/Users/raccoon/Documents/LinearRegression/LinearFunction/theta_values'
+        with open(path, 'w') as f:
             f.write(str(self.theta0) + ' ' + str(self.theta1) + '\n')
 
 def main(argv):
     usage = '''usage: ./gradientdescent [-vg]
         -v: verbosity
         -g: graphical output'''
+    v = False
+    g = False
     if len(argv) > 2:
         print (usage)
         raise Exception()
