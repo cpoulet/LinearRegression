@@ -7,9 +7,9 @@ class LinearFunction:
         self.theta0 = 0
         self.theta1 = 0
         self.v = verbose
-        self.get_theta()
+        self._get_theta()
 
-    def get_theta(self):
+    def _get_theta(self):
         print('''Enter the path to load the thetas values (\033[1;37mReturn\033[0;m to use the standard path '/Users/raccoon/Documents/LinearRegression/LinearFunction/theta_values') :''')
         path = input().strip()
         if not path:

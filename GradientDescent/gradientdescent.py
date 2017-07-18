@@ -52,9 +52,9 @@ class GradientDescent:
         if self.v:
             print('[info] The data has been loaded.')
         if self.g:
-            self.show_plane()
+            self._show_plane()
    
-    def generator(self):
+    def _generator(self):
         for couple in zip(self.data[self.x], self.data[self.y]):
             yield couple
 
@@ -65,11 +65,11 @@ class GradientDescent:
         self.max_y = max(self.data[self.y])
         diff_x = self.max_x - self.min_x
         diff_y = self.max_y - self.min_y
-        self.stdata = [((d[0] - self.min_x) / diff_x, (d[1] - self.min_y) / diff_y) for d in self.generator()]
+        self.stdata = [((d[0] - self.min_x) / diff_x, (d[1] - self.min_y) / diff_y) for d in self._generator()]
 
-    def gradient_step(self):
-        theta0_gradient = self.t0_gradient()
-        theta1_gradient = self.t1_gradient()
+    def _gradient_step(self):
+        theta0_gradient = self._t0_gradient()
+        theta1_gradient = self._t1_gradient()
         self.theta0 = self.theta0 - (self.LearningRate * theta0_gradient)
         self.theta1 = self.theta1 - (self.LearningRate * theta1_gradient)
    
@@ -81,25 +81,25 @@ class GradientDescent:
         if self.v:
             print('[info] theta0 = {:.1f} and theta1 = {:.3f}'.format(self.theta0, self.theta1))
         if self.g:
-            self.show_rslt()
+            self._show_rslt()
 
     def train(self):
         rookie = True
         while rookie:
-            err = self.fct_std_error()
+            err = self._fct_std_error()
             l = len(self.error)
             if l:
                 if err == self.error[-1] or l == 10000:
                     rookie = False
             self.error.append(err)
-            self.gradient_step()
+            self._gradient_step()
         if self.v:
             if l != 10000:
                 print('[info] \033[1;32mThe model just converged after', l, 'step.\033[0;m')
             else:
                 print('[info] \033[1;31mThe model did not converged after', l, 'step.\033[0;m')
     
-    def show_rslt(self):
+    def _show_rslt(self):
         X = self.data[self.x]
         Y = self.data[self.y]
         plt.subplot(211)
@@ -116,28 +116,28 @@ class GradientDescent:
         plt.tight_layout()
         plt.show()
 
-    def fct_error(self, t0, t1):
-        return sum([(d[1] - (d[0] * t1 + t0)) ** 2 for d in self.generator()]) / self.m
+    def _fct_error(self, t0, t1):
+        return sum([(d[1] - (d[0] * t1 + t0)) ** 2 for d in self._generator()]) / self.m
 
-    def t0_gradient(self, t0 = None, t1 = None):
+    def _t0_gradient(self, t0 = None, t1 = None):
         if t0 == None or t1 == None:
             t0 = self.theta0
             t1 = self.theta1
         return sum([(d[0] * t1 + t0) - d[1] for d in self.stdata]) / self.m
 
-    def t1_gradient(self, t0 = None, t1 = None):
+    def _t1_gradient(self, t0 = None, t1 = None):
         if t0 == None or t1 == None:
             t0 = self.theta0
             t1 = self.theta1
         return sum([d[0] * ((d[0] * t1 + t0) - d[1]) for d in self.stdata]) / self.m
 
-    def show_plane(self):
+    def _show_plane(self):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         x = np.arange(-20000, 50000, 2500)
         y = np.arange(-0.5, 0.5, 0.005)
         X, Y = np.meshgrid(x, y)
-        zs = np.array([self.fct_error(b,a) for b,a in zip(np.ravel(X), np.ravel(Y))])
+        zs = np.array([self._fct_error(b,a) for b,a in zip(np.ravel(X), np.ravel(Y))])
         Z = zs.reshape(X.shape)
         ax.plot_surface(X, Y, Z, cmap = 'Reds', edgecolors='black')
         ax.set_xlabel('θ_0 (y-intercept)', fontweight='bold')
@@ -149,7 +149,7 @@ class GradientDescent:
         fig.tight_layout()
         plt.show()
 
-    def fct_std_error(self, t0 = None, t1 = None):
+    def _fct_std_error(self, t0 = None, t1 = None):
         if t0 == None or t1 == None:
             t0 = self.theta0
             t1 = self.theta1
