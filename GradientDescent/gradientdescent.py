@@ -2,6 +2,7 @@
 
 import sys
 import random
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,7 +13,7 @@ class GradientDescent:
        .x = 'km'          X
        .y = 'price'       Y
     '''
-    def __init__(self, verbose = False, graph = False):
+    def __init__(self, verbose = False, graph = False, precision = False):
         self.data = {}
         self.stdata = []
         self.error = []
@@ -28,16 +29,19 @@ class GradientDescent:
         self.theta1 = random.uniform(-100, 100)
         self.v = verbose
         self.g = graph
+        self.p = precision
+        self._DATAPATH = '/Users/cpoulet/Documents/ft_LinearRegression/Dataset/data.csv'
+        self._THETAPATH = '/Users/cpoulet/Documents/ft_LinearRegression/LinearFunction/theta_values'
         if verbose:
             print('[info] verbose mode.')
             if graph:
                 print('[info] graphical output mode.')
 
     def get_data(self):
-        print('''Enter the path of the datas (\033[1;37mReturn\033[0;m to use the standard path '/Users/raccoon/Documents/LinearRegression/Dataset/data.csv') :''')
+        print('Enter the path of the datas (\033[1;37mReturn\033[0;m to use the standard path ' + self._DATAPATH + ') :')
         path = input().strip()
         if not path:
-            path = '/Users/raccoon/Documents/LinearRegression/Dataset/data.csv'
+            path = self._DATAPATH
         with open(path, 'r') as f:
             for l in f:
                 if self.x == None and self.y == None:
@@ -79,7 +83,7 @@ class GradientDescent:
         self.theta1 = self.theta1 * diff_y / diff_x
         self.theta0 = self.theta0 * diff_y + self.min_y - self.theta1*self.min_x
         if self.v:
-            print('[info] theta0 = {:.1f} and theta1 = {:.3f}'.format(self.theta0, self.theta1))
+            print('[info] \033[1;37mtheta0 = {:.1f}\033[0;m and \033[1;37mtheta1 = {:.3f}\033[0;m'.format(self.theta0, self.theta1))
         if self.g:
             self._show_rslt()
 
@@ -155,34 +159,34 @@ class GradientDescent:
             t1 = self.theta1
         return sum([(d[1] - (d[0] * t1 + t0)) ** 2 for d in self.stdata]) / self.m
 
+    def _rSquared(self):
+        l = len(self.data['price'])
+        moy = sum(self.data['price']) / l
+        sstot = sum([(y - moy) ** 2 for y in self.data['price']])
+        ssres = sum([(y - self.estimate(y)) ** 2 for y in self.data['price']])
+        r2 = 1 - (sstot / ssres)
+        print('The precision of the linear regression is = \033[1;37m{:.2f}%\033[0;m'.format(r2 * 100))
+
     def estimate(self, mileage):
         return self.theta0 + self.theta1 * mileage
 
     def save_theta(self):
-        print('''Enter the path to save thetas values (\033[1;37mReturn\033[0;m to use the standard path '/Users/raccoon/Documents/LinearRegression/LinearFunction/theta_values') :''')
+        print('Enter the path to save thetas values (\033[1;37mReturn\033[0;m to use the standard path ' + self._THETAPATH + ') :')
         path = input().strip()
         if not path:
-            path = '/Users/raccoon/Documents/LinearRegression/LinearFunction/theta_values'
+            path = self._THETAPATH
         with open(path, 'w') as f:
             f.write(str(self.theta0) + ' ' + str(self.theta1) + '\n')
+        if self.p:
+            self._rSquared()
 
 def main(argv):
-    usage = '''usage: ./gradientdescent [-vg]
-        -v: verbosity
-        -g: graphical output'''
-    v = False
-    g = False
-    if len(argv) > 2:
-        print (usage)
-        raise Exception()
-    if len(argv) == 2:
-        if argv[1] in ['-vg','-gv','-v', '-g']:
-            v = True if 'v' in argv[1] else False
-            g = True if 'g' in argv[1] else False
-        else:
-            print (usage)
-            raise Exception()
-    GD = GradientDescent(v, g)
+    parser = argparse.ArgumentParser(description='Compute theta 0 and theta 1 of a dataset using a Gradient descent')
+    parser.add_argument('-v', '--verbosity', action='store_true', help='verbosity expanded')
+    parser.add_argument('-g', '--graphical', action='store_true', help='graphical output')
+    parser.add_argument('-p', '--precision', action='store_true', help='precision output (proportion of model variance and data variance)')
+    args = parser.parse_args()
+    GD = GradientDescent(args.verbosity, args.graphical, args.precision)
     GD.get_data()
     GD.scaling()
     GD.train()
